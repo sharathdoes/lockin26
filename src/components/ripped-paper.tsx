@@ -262,7 +262,7 @@ export default function RippedPaper({
             >
               <div className="relative pt-3 md:pt-6 px-3 md:px-6">
                 <h1 className="text-5xl sm:text-6xl md:text-8xl leading-none">
-                  NY 2025
+                  NY 2026
                 </h1>
                 <div className="">
                   <svg

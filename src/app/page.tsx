@@ -1,19 +1,70 @@
 'use client'
 
-import { useState } from 'react'
 import dynamic from 'next/dynamic'
-
+import { useState, useEffect } from 'react';
+import { DrawPath } from '@/types'
+import Header from '@/components/header'
+import SaveModal from '@/components/save-modal'
 const DynamicRippedPaper = dynamic(() => import('@/components/ripped-paper'), { ssr: false })
 
 export default function Home() {
   const [content, setContent] = useState('')
+  const [paths, setPaths] = useState<DrawPath[]>([]);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [template, setTemplate] = useState<'blank' | 'lines' | 'checklist'>('blank');
+  const [font, setFont] = useState('font-signature');
+  const [color, setColor] = useState('#2563eb');
+  const [rotation, setRotation] = useState(0);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+ useEffect(() => {
+    setRotation(Math.random() * 10 - 5);
+  }, []);
 
   const handleContentChange = (value: string) => {
-    setContent(value)
-  }
+    setContent(value);
+  };
+
+  const handleSave = () => {
+    setShowSaveModal(true);
+  };
+
+  const handleSaveSuccess = () => {
+    setSaveSuccess(true);
+    setTimeout(() => {
+      setSaveSuccess(false);
+      // Reset for new note
+      setContent('');
+      setPaths([]);
+      setRotation(Math.random() * 10 - 5);
+    }, 2000);
+  };
 
   return (
+    <>
+     <Header onSave={handleSave} showSaveButton={true} />
+      
+      {saveSuccess && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg z-50 shadow-lg" data-testid="success-message">
+          ✓ LockIn saved successfully!
+        </div>
+      )}
       <DynamicRippedPaper content={content} onContentChange={handleContentChange} />
+      
+       <SaveModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        noteData={{
+          content,
+          paths,
+          template,
+          font,
+          color,
+          rotation,
+        }}
+        onSaveSuccess={handleSaveSuccess}
+      />
+      </>
   )
 }
 

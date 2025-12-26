@@ -17,11 +17,11 @@ export const metadata: Metadata = {
   ],
   authors: [
     {
-      name: "Daniel Petho",
-      url: "https://danielpetho.com",
+      name: "sharath",
+      url: "https://github.com/sharathdoes/lockin26",
     },
   ],
-  creator: "danielpetho",
+  creator: "sharath",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -59,6 +59,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Shadows+Into+Light&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className={`font-signature`}
       >

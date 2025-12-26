@@ -10,8 +10,10 @@ export default {
   theme: {
   	extend: {
 		fontFamily: {
-			signature: ['The Signature', 'sans-serif'],
-		},
+        signature: ['"Shadows Into Light"', 'cursive'],
+      	dancing: ['"Dancing Script"', 'cursive'],
+      },
+
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
