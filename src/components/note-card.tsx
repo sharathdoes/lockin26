@@ -3,8 +3,9 @@
 import { Note } from '@/types';
 import { Heart, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import { storage } from '@/lib/storage';
 import { useState, useEffect } from 'react';
+import { cheerNote } from '@/actions/notes';
+import { storage } from '@/lib/storage';
 
 interface NoteCardProps {
   note: Note;
@@ -14,42 +15,68 @@ interface NoteCardProps {
 export default function NoteCard({ note, onCheerUpdate }: NoteCardProps) {
   const [hasCheered, setHasCheered] = useState(false);
   const [cheerCount, setCheerCount] = useState(note.cheers);
+  const [isCheering, setIsCheering] = useState(false);
 
   useEffect(() => {
     setHasCheered(storage.hasCheered(note.id));
     setCheerCount(note.cheers);
   }, [note.id, note.cheers]);
 
-  const handleCheer = (e: React.MouseEvent) => {
+  const handleCheer = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (hasCheered) return;
-    
-    const success = storage.addCheer(note.id);
-    if (success) {
-      setHasCheered(true);
-      setCheerCount(prev => prev + 1);
+
+    if (hasCheered || isCheering) return;
+
+    // prevent double-click spam
+    setIsCheering(true);
+
+    // client-side guard
+    const allowed = storage.addCheer(note.id);
+    if (!allowed) {
+      setIsCheering(false);
+      return;
+    }
+
+    // optimistic UI update
+    setHasCheered(true);
+    setCheerCount((prev) => prev + 1);
+
+    try {
+      await cheerNote(note.id); // ✅ Prisma update
       onCheerUpdate?.();
+    } catch (err) {
+      // rollback if server fails
+      setHasCheered(false);
+      setCheerCount((prev) => prev - 1);
+      console.error('Failed to cheer note', err);
+    } finally {
+      setIsCheering(false);
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   };
 
   return (
     <Link href={`/note/${note.id}`} data-testid={`note-card-${note.id}`}>
       <div className="group bg-gray-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-white transition-all cursor-pointer">
-        {/* Thumbnail Preview */}
+        {/* Thumbnail */}
         <div className="aspect-[4/5] bg-black flex items-center justify-center p-4">
-          <div 
+          <div
             className="w-full h-full bg-[#efefef] rounded-sm flex items-center justify-center relative"
             style={{ transform: `rotate(${note.rotation}deg)` }}
           >
             <div className="absolute top-4 left-4 right-4">
-              <h3 className="text-2xl md:text-3xl font-bold text-blue-600 leading-none">NY 2026</h3>
+              <h3 className="text-2xl md:text-3xl font-bold text-blue-600 leading-none">
+                NY 2026
+              </h3>
             </div>
             {note.content && (
               <div className="px-4 text-blue-600 text-sm md:text-base line-clamp-6 mt-12">
@@ -59,22 +86,32 @@ export default function NoteCard({ note, onCheerUpdate }: NoteCardProps) {
           </div>
         </div>
 
-        {/* Info Footer */}
+        {/* Footer */}
         <div className="p-4">
           <div className="flex items-center justify-between text-sm text-gray-400">
-            <span data-testid="note-date">{formatDate(note.createdAt)}</span>
+            <span data-testid="note-date">
+              {formatDate(note.createdAt)}
+            </span>
+
             <div className="flex items-center gap-4">
               <button
                 onClick={handleCheer}
                 data-testid="cheer-button"
+                disabled={hasCheered || isCheering}
                 className={`flex items-center gap-1 transition-colors ${
-                  hasCheered ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                  hasCheered
+                    ? 'text-red-500'
+                    : 'text-gray-400 hover:text-red-500'
                 }`}
-                disabled={hasCheered}
               >
-                <Heart className={`w-4 h-4 ${hasCheered ? 'fill-current' : ''}`} />
+                <Heart
+                  className={`w-4 h-4 ${
+                    hasCheered ? 'fill-current' : ''
+                  }`}
+                />
                 <span data-testid="cheer-count">{cheerCount}</span>
               </button>
+
               <div className="flex items-center gap-1" data-testid="comment-count">
                 <MessageCircle className="w-4 h-4" />
                 <span>{note.comments.length}</span>
