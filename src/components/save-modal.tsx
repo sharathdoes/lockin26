@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Note,DrawPath } from '@/types'
 import { storage } from "@/lib/storage"
+import { saveNote } from '@/actions/notes'
 
 interface SaveModalProps {
   isOpen: boolean;
@@ -25,37 +26,18 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    if (!email || !email.includes('@')) {
-      alert('Please enter a valid email address');
-      return;
-    }
+  await saveNote({
+    email,
+    content: noteData.content,
+    paths: noteData.paths,
+    rotation: noteData.rotation,
+    isPublic,
+    reminderDate,
+  })
 
-    setIsSaving(true);
-
-    const note: Note = {
-      id: storage.generateId(),
-      email,
-      content: noteData.content,
-      paths: noteData.paths,
-      isPublic,
-      reminderDate: reminderDate || undefined,
-      createdAt: new Date().toISOString(),
-      cheers: 0,
-      comments: [],
-      rotation: noteData.rotation,
-    };
-
-    storage.saveNote(note);
-
-    setTimeout(() => {
-      setIsSaving(false);
-      onSaveSuccess();
-      onClose();
-      setEmail('');
-      setIsPublic(false);
-      setReminderDate('');
-    }, 500);
-  };
+  onSaveSuccess()
+  onClose()
+}
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" data-testid="save-modal">

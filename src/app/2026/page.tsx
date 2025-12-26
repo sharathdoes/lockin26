@@ -5,6 +5,7 @@ import Header from '@/components/header';
 import NoteCard from '@/components/note-card'
 import { storage } from '@/lib/storage';
 import { Note } from '@/types';
+import { getPublicNotes } from '@/actions/notes'
 
 export default function Feed2026() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -14,13 +15,10 @@ export default function Feed2026() {
     loadNotes();
   }, []);
 
-  const loadNotes = () => {
-    const publicNotes = storage.getPublicNotes();
-    // Sort by created date (newest first)
-    const sorted = publicNotes.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    setNotes(sorted);
+  const loadNotes = async () => {
+  const publicNotes = await getPublicNotes()
+    
+    setNotes(publicNotes);
     setIsLoading(false);
   };
 
