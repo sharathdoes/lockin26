@@ -1,59 +1,17 @@
 'use client';
 
 import { Note } from '@/types';
-import { Heart, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { cheerNote } from '@/actions/notes';
-import { storage } from '@/lib/storage';
 
 interface NoteCardProps {
   note: Note;
   onCheerUpdate?: () => void;
 }
 
-export default function NoteCard({ note, onCheerUpdate }: NoteCardProps) {
-  const [hasCheered, setHasCheered] = useState(false);
-  const [cheerCount, setCheerCount] = useState(note.cheers);
-  const [isCheering, setIsCheering] = useState(false);
+export default function NoteCard({ note }: NoteCardProps) {
 
-  useEffect(() => {
-    setHasCheered(storage.hasCheered(note.id));
-    setCheerCount(note.cheers);
-  }, [note.id, note.cheers]);
-
-  const handleCheer = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (hasCheered || isCheering) return;
-
-    // prevent double-click spam
-    setIsCheering(true);
-
-    // client-side guard
-    const allowed = storage.addCheer(note.id);
-    if (!allowed) {
-      setIsCheering(false);
-      return;
-    }
-
-    // optimistic UI update
-    setHasCheered(true);
-    setCheerCount((prev) => prev + 1);
-
-    try {
-      await cheerNote(note.id); // ✅ Prisma update
-      onCheerUpdate?.();
-    } catch (err) {
-      // rollback if server fails
-      setHasCheered(false);
-      setCheerCount((prev) => prev - 1);
-      console.error('Failed to cheer note', err);
-    } finally {
-      setIsCheering(false);
-    }
-  };
+  
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -94,7 +52,7 @@ export default function NoteCard({ note, onCheerUpdate }: NoteCardProps) {
             </span>
 
             <div className="flex items-center gap-4">
-              <button
+              {/* <button
                 onClick={handleCheer}
                 data-testid="cheer-button"
                 disabled={hasCheered || isCheering}
@@ -110,7 +68,7 @@ export default function NoteCard({ note, onCheerUpdate }: NoteCardProps) {
                   }`}
                 />
                 <span data-testid="cheer-count">{cheerCount}</span>
-              </button>
+              </button> */}
 
               <div className="flex items-center gap-1" data-testid="comment-count">
                 <MessageCircle className="w-4 h-4" />

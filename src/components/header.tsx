@@ -29,17 +29,7 @@ export default function Header({
 
         {/* RIGHT */}
         <nav className="flex shrink-0 items-center gap-4 md:gap-8">
-          <Link
-            href="/"
-            className={cn(
-              'text-sm md:text-base',
-              pathname === '/'
-                ? 'text-white font-semibold'
-                : 'text-gray-400 hover:text-white'
-            )}
-          >
-            Home
-          </Link>
+        
 
           <Link
             href="/2026"
@@ -50,7 +40,7 @@ export default function Header({
                 : 'text-gray-400 hover:text-white'
             )}
           >
-            /2026
+            /public
           </Link>
 
           
