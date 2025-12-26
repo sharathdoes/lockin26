@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/header';
 import NoteCard from '@/components/note-card'
-import { storage } from '@/lib/storage';
 import { Note } from '@/types';
 import { getPublicNotes } from '@/actions/notes'
 

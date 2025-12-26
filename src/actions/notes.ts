@@ -2,7 +2,27 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { Note, Comment } from '@/types'
+
+/* -------------------------------
+   Helpers
+-------------------------------- */
+
+function serializeNote(note: any) {
+  if (!note) return null
+
+  return {
+    ...note,
+    createdAt: note.createdAt.toISOString(),
+    comments: note.comments?.map((c: any) => ({
+      ...c,
+      createdAt: c.createdAt.toISOString(),
+    })) ?? [],
+  }
+}
+
+/* -------------------------------
+   Actions
+-------------------------------- */
 
 export async function saveNote(data: {
   email: string
@@ -23,32 +43,45 @@ export async function saveNote(data: {
         ? new Date(data.reminderDate)
         : null,
     },
+    include: {
+      comments: true,
+    },
   })
 
   revalidatePath('/2026')
-  return note
+  return serializeNote(note)
 }
 
 export async function getPublicNotes() {
-  return prisma.note.findMany({
+  const notes = await prisma.note.findMany({
     where: { isPublic: true },
     orderBy: { createdAt: 'desc' },
     include: { comments: true },
   })
+
+  return notes.map(serializeNote)
 }
 
 export async function getNoteById(id: string) {
-  return prisma.note.findUnique({
+  const note = await prisma.note.findUnique({
     where: { id },
     include: { comments: true },
   })
+
+  return serializeNote(note)
 }
 
 export async function cheerNote(noteId: string) {
-  return prisma.note.update({
+  const note = await prisma.note.update({
     where: { id: noteId },
     data: { cheers: { increment: 1 } },
+    include: { comments: true },
   })
+
+  revalidatePath('/2026')
+  revalidatePath(`/note/${noteId}`)
+
+  return serializeNote(note)
 }
 
 export async function addComment(
@@ -56,11 +89,18 @@ export async function addComment(
   userEmail: string,
   text: string
 ) {
-  return prisma.comment.create({
+  const comment = await prisma.comment.create({
     data: {
       noteId,
       userEmail,
       text,
     },
   })
+
+  revalidatePath(`/note/${noteId}`)
+
+  return {
+    ...comment,
+    createdAt: comment.createdAt.toISOString(),
+  }
 }
