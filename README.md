@@ -4,5 +4,5 @@ A simple, minimalist app that lets you write or draw handwritten-style notes wit
 
 
 
-![Lock In 2026 Preview](<img width="1870" height="933" alt="image" src="https://github.com/user-attachments/assets/fe7040a0-d657-4b42-9e37-7e08493c8b0f" />
-)
+<img width="1870" height="933" alt="image" src="https://github.com/user-attachments/assets/fe7040a0-d657-4b42-9e37-7e08493c8b0f" />
+
