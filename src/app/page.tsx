@@ -11,9 +11,7 @@ export default function Home() {
   const [content, setContent] = useState('')
   const [paths, setPaths] = useState<DrawPath[]>([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [template, setTemplate] = useState<'blank' | 'lines' | 'checklist'>('blank');
-  const [font, setFont] = useState('font-signature');
-  const [color, setColor] = useState('#2563eb');
+
   const [rotation, setRotation] = useState(0);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -57,9 +55,7 @@ export default function Home() {
         noteData={{
           content,
           paths,
-          template,
-          font,
-          color,
+          
           rotation,
         }}
         onSaveSuccess={handleSaveSuccess}

@@ -133,7 +133,7 @@ export default function NotePage() {
                 </svg>
                 
                 <div className="absolute top-4 left-4 right-4">
-                  <h3 className="text-4xl font-bold leading-none" style={{ color: note.color }}>
+                  <h3 className="text-4xl font-bold leading-none" >
                     NY 2026
                   </h3>
                 </div>
@@ -141,7 +141,7 @@ export default function NotePage() {
                 {note.content && (
                   <div 
                     className="px-6 text-lg line-clamp-10 mt-16"
-                    style={{ color: note.color }}
+                   
                   >
                     {note.content}
                   </div>

@@ -22,9 +22,7 @@ export interface Note {
   createdAt: string;
   cheers: number;
   comments: Comment[];
-  template: 'blank' | 'lines' | 'checklist';
-  font: string;
-  color: string;
+
   rotation: number;
 }
 

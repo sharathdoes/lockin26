@@ -2,17 +2,15 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { Note } from '@/types'
+import { Note,DrawPath } from '@/types'
 import { storage } from "@/lib/storage"
+
 interface SaveModalProps {
   isOpen: boolean;
   onClose: () => void;
   noteData: {
     content: string;
-    paths: any[];
-    template: 'blank' | 'lines' | 'checklist';
-    font: string;
-    color: string;
+    paths: DrawPath[];
     rotation: number;
   };
   onSaveSuccess: () => void;
@@ -44,9 +42,6 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
       createdAt: new Date().toISOString(),
       cheers: 0,
       comments: [],
-      template: noteData.template,
-      font: noteData.font,
-      color: noteData.color,
       rotation: noteData.rotation,
     };
 
