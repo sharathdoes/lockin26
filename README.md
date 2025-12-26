@@ -1,6 +1,6 @@
 # Lock In 2026
 
-A simple, minimalist app that lets you write or draw handwritten-style notes with a ripped paper look, then save your 2026 thoughts as images.
+A simple, minimalist app that lets you write or draw handwritten-style notes with a ripped paper look, then save your 2026 thoughts as images, and remind you on a set date via email. 
 
 
 
