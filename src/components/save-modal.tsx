@@ -102,7 +102,10 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
             data-testid="save-note-button"
             className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
+            Save resolution
           </button>
+          <div > <a  target="_parent" href="https://github.com/sharathdoes" >by @sharathdoes</a></div>
+          
         </div>
       </div>
     </div>
