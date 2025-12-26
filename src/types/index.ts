@@ -18,8 +18,8 @@ export interface Note {
   content: string;
   paths: DrawPath[];
   isPublic: boolean;
-  reminderDate?: string;
-  createdAt: string;
+  reminderDate: string | null;
+createdAt: string;
   cheers: number;
   comments: Comment[];
 
@@ -37,4 +37,26 @@ export interface Template {
   id: 'blank' | 'lines' | 'checklist';
   name: string;
   preview: string;
+}
+
+
+export type CommentDTO = {
+  id: string
+  noteId: string
+  userEmail: string
+  text: string
+  createdAt: string
+}
+
+export type NoteDTO = {
+  id: string
+  email: string
+  content: string
+  paths: DrawPath[] // or DrawPath[] if parsed
+  rotation: number
+  isPublic: boolean
+  cheers: number
+  createdAt: string
+  reminderDate: string | undefined
+  comments: CommentDTO[]
 }

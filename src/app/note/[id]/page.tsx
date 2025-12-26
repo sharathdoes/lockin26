@@ -10,6 +10,7 @@ import {
   cheerNote,
   addComment,
 } from '@/actions/notes'
+import { mapNoteDTO } from '@/lib/map'
 
 export default function NotePage() {
   const params = useParams()
@@ -35,7 +36,7 @@ export default function NotePage() {
         return
       }
 
-      setNote(data)
+setNote(mapNoteDTO(data))
       setLoading(false)
     }
 

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { Note,DrawPath } from '@/types'
-import { storage } from "@/lib/storage"
+import { DrawPath } from '@/types'
 import { saveNote } from '@/actions/notes'
+import { Prisma } from '@prisma/client'
 
 interface SaveModalProps {
   isOpen: boolean;
@@ -21,7 +21,6 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
   const [email, setEmail] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [reminderDate, setReminderDate] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
 
   if (!isOpen) return null;
 
@@ -29,7 +28,7 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
   await saveNote({
     email,
     content: noteData.content,
-    paths: noteData.paths,
+    paths: noteData.paths as unknown as Prisma.InputJsonValue,
     rotation: noteData.rotation,
     isPublic,
     reminderDate,
@@ -101,10 +100,8 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
           <button
             onClick={handleSave}
             data-testid="save-note-button"
-            disabled={isSaving}
             className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSaving ? 'Saving...' : 'Save my LockIn'}
           </button>
         </div>
       </div>

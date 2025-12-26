@@ -2,37 +2,42 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { Prisma } from '@prisma/client'
 
 /* -------------------------------
    Helpers
 -------------------------------- */
 
-function serializeNote(note: any) {
+type NoteWithComments = Prisma.NoteGetPayload<{
+  include: { comments: true }
+}>
+
+function serializeNote(note: NoteWithComments | null) {
   if (!note) return null
 
   return {
     ...note,
     createdAt: note.createdAt.toISOString(),
-    comments: note.comments?.map((c: any) => ({
+    reminderDate: note.reminderDate?.toISOString() ?? null,
+    comments: note.comments.map(c => ({
       ...c,
       createdAt: c.createdAt.toISOString(),
-    })) ?? [],
+    })),
   }
 }
 
 /* -------------------------------
    Actions
 -------------------------------- */
-
 export async function saveNote(data: {
   email: string
   content: string
-  paths: any[]
+  paths: Prisma.InputJsonValue
   rotation: number
   isPublic: boolean
   reminderDate?: string
 }) {
-  const note = await prisma.note.create({
+  return prisma.note.create({
     data: {
       email: data.email,
       content: data.content,
@@ -43,13 +48,7 @@ export async function saveNote(data: {
         ? new Date(data.reminderDate)
         : null,
     },
-    include: {
-      comments: true,
-    },
   })
-
-  revalidatePath('/2026')
-  return serializeNote(note)
 }
 
 export async function getPublicNotes() {
@@ -59,8 +58,11 @@ export async function getPublicNotes() {
     include: { comments: true },
   })
 
-  return notes.map(serializeNote)
+  return notes
+    .map(serializeNote)
+    .filter((n): n is NonNullable<typeof n> => n !== null)
 }
+
 
 export async function getNoteById(id: string) {
   const note = await prisma.note.findUnique({

@@ -5,6 +5,7 @@ import Header from '@/components/header';
 import NoteCard from '@/components/note-card'
 import { Note } from '@/types';
 import { getPublicNotes } from '@/actions/notes'
+import { mapNoteDTO } from '@/lib/map';
 
 export default function Feed2026() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -17,7 +18,7 @@ export default function Feed2026() {
   const loadNotes = async () => {
   const publicNotes = await getPublicNotes()
     
-    setNotes(publicNotes);
+    setNotes(publicNotes.map(mapNoteDTO))
     setIsLoading(false);
   };
 
