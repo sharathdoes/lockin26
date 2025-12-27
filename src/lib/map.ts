@@ -25,11 +25,24 @@ type NoteDTO = {
 
 export function mapNoteDTO(dto: NoteDTO): Note {
   return {
-    ...dto,
-    imageUrl: dto.imageUrl ?? null,
+    id: dto.id,
+    email: dto.email,
+    content: dto.content,
+    rotation: dto.rotation,
+    isPublic: dto.isPublic,
+    cheers: dto.cheers,
+    createdAt: dto.createdAt,
+
+    // ✅ normalize optional → explicit
     reminderType: dto.reminderType ?? null,
+    reminderDate: dto.reminderDate ?? null,
+
+    imageUrl: dto.imageUrl ?? null,
+
     paths: Array.isArray(dto.paths)
       ? (dto.paths as DrawPath[])
-      : [], // ✅ GUARANTEED DrawPath[]
+      : [],
+
+    comments: dto.comments,
   }
 }
