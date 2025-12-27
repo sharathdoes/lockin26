@@ -27,6 +27,7 @@ export function mapNoteDTO(dto: NoteDTO): Note {
   return {
     ...dto,
     imageUrl: dto.imageUrl ?? null,
+    reminderType: dto.reminderType ?? null,
     paths: Array.isArray(dto.paths)
       ? (dto.paths as DrawPath[])
       : [], // ✅ GUARANTEED DrawPath[]
