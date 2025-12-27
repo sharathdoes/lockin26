@@ -1,4 +1,5 @@
 import { Note, DrawPath } from '@/types'
+export type ReminderType = 'monthly' | 'date';
 
 type NoteDTO = {
   id: string
@@ -9,7 +10,10 @@ type NoteDTO = {
   isPublic: boolean
   cheers: number
   createdAt: string
+    reminderType?: ReminderType | null;
+  
   reminderDate: string | null
+  imageUrl?: string | null
   comments: {
     id: string
     noteId: string
@@ -22,6 +26,7 @@ type NoteDTO = {
 export function mapNoteDTO(dto: NoteDTO): Note {
   return {
     ...dto,
+    imageUrl: dto.imageUrl ?? null,
     paths: Array.isArray(dto.paths)
       ? (dto.paths as DrawPath[])
       : [], // ✅ GUARANTEED DrawPath[]

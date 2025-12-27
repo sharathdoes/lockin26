@@ -167,12 +167,19 @@ setNote(mapNoteDTO(data))
                 </div>
 
                 {note.content && (
-                  <div className="px-6 text-lg mt-16">
+                  <div className="px-6 py-8 text-lg mt-16">
                     {note.content}
                   </div>
                 )}
               </div>
             </div>
+                  {note.imageUrl && (
+  <img
+    src={note.imageUrl}
+    alt="Attached"
+    className="absolute top-20 right-1/2 -translate-x-1/2 w-40 h-40 object-cover rounded-sm shadow-md"
+  />
+)}
 
             {/* Interaction bar */}
             <div className="flex justify-between bg-gray-900 p-4 rounded-lg text-white">

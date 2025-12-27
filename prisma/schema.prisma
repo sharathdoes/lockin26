@@ -6,20 +6,30 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum ReminderType {
+  monthly
+  date
+}
 
 model Note {
-  id           String    @id @default(uuid())
+  id           String        @id @default(uuid())
   email        String
   content      String
   paths        Json
   rotation     Float
-  isPublic     Boolean   @default(false)
+  isPublic     Boolean       @default(false)
+
+  reminderType ReminderType?
   reminderDate DateTime?
-  cheers       Int       @default(0)
-  createdAt    DateTime  @default(now())
+
+  imageUrl     String?
+
+  cheers       Int           @default(0)
+  createdAt    DateTime      @default(now())
 
   comments     Comment[]
 }
+
 
 model Comment {
   id        String   @id @default(uuid())

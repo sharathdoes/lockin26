@@ -11,6 +11,7 @@ export interface Point {
   x: number;
   y: number;
 }
+export type ReminderType = 'monthly' | 'date';
 
 export interface Note {
   id: string;
@@ -18,11 +19,15 @@ export interface Note {
   content: string;
   paths: DrawPath[];
   isPublic: boolean;
+
+  reminderType: ReminderType | null;
   reminderDate: string | null;
-createdAt: string;
+
+  imageUrl?: string | null;
+
+  createdAt: string;
   cheers: number;
   comments: Comment[];
-
   rotation: number;
 }
 
@@ -47,16 +52,20 @@ export type CommentDTO = {
   text: string
   createdAt: string
 }
-
 export type NoteDTO = {
-  id: string
-  email: string
-  content: string
-  paths: DrawPath[] // or DrawPath[] if parsed
-  rotation: number
-  isPublic: boolean
-  cheers: number
-  createdAt: string
-  reminderDate: string | undefined
-  comments: CommentDTO[]
-}
+  id: string;
+  email: string;
+  content: string;
+  paths: DrawPath[];
+  rotation: number;
+  isPublic: boolean;
+
+  reminderType?: ReminderType | null;
+  reminderDate?: string | null;
+
+  imageUrl?: string | null;
+
+  cheers: number;
+  createdAt: string;
+  comments: CommentDTO[];
+};

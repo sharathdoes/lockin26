@@ -1,10 +1,11 @@
-'use client';
+"use client";
+import { Plus } from 'lucide-react'
 
-import { useState } from 'react';
-import { X } from 'lucide-react';
-import { DrawPath } from '@/types'
-import { saveNote } from '@/actions/notes'
-import { Prisma } from '@prisma/client'
+import { useState } from "react";
+import { X } from "lucide-react";
+import { DrawPath } from "@/types";
+import { saveNote } from "@/actions/notes";
+import { Prisma } from "@prisma/client";
 
 interface SaveModalProps {
   isOpen: boolean;
@@ -17,29 +18,84 @@ interface SaveModalProps {
   onSaveSuccess: () => void;
 }
 
-export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: SaveModalProps) {
-  const [email, setEmail] = useState('');
+export default function SaveModal({
+  isOpen,
+  onClose,
+  noteData,
+  onSaveSuccess,
+}: SaveModalProps) {
+  const [email, setEmail] = useState("");
   const [isPublic, setIsPublic] = useState(false);
-  const [reminderDate, setReminderDate] = useState('');
+  const [reminderType, setReminderType] = useState<"monthly" | "date">(
+    "monthly"
+  );
+  const [reminderDate, setReminderDate] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   if (!isOpen) return null;
+  async function uploadImageToCloudinary(file: File): Promise<string> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!)
 
-  const handleSave = async () => {
-  await saveNote({
-    email,
-    content: noteData.content,
-    paths: noteData.paths as unknown as Prisma.InputJsonValue,
-    rotation: noteData.rotation,
-    isPublic,
-    reminderDate,
-  })
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  )
 
-  onSaveSuccess()
-  onClose()
+  if (!res.ok) {
+    throw new Error('Image upload failed')
+  }
+
+  const data = await res.json()
+  return data.secure_url as string
+}
+
+ const handleSave = async () => {
+  try {
+    setIsUploading(true)
+    if (reminderType === 'date' && !reminderDate) {
+  alert('Please select a reminder date')
+  return
+}
+
+
+    let imageUrl: string | undefined = undefined
+
+    if (imageFile) {
+      imageUrl = await uploadImageToCloudinary(imageFile)
+    }
+
+    await saveNote({
+      email,
+      content: noteData.content,
+      paths: noteData.paths as unknown as Prisma.InputJsonValue,
+      rotation: noteData.rotation,
+      isPublic,
+      reminderType,
+      reminderDate,
+      imageUrl,
+    })
+
+    onSaveSuccess()
+    onClose()
+  } catch (err) {
+    console.error(err)
+    alert('Failed to save note')
+  } finally {
+    setIsUploading(false)
+  }
 }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80" data-testid="save-modal">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+      data-testid="save-modal"
+    >
       <div className="bg-white rounded-lg p-6 md:p-8 max-w-md w-full mx-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-black">Save Your LockIn</h2>
@@ -52,9 +108,53 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
           </button>
         </div>
 
+       <div className="flex items-center justify-center">
+  <label
+    htmlFor="image-upload"
+    className="w-20 h-20 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-black transition"
+  >
+    {imageFile ? (
+      <img
+        src={URL.createObjectURL(imageFile)}
+        alt="Preview"
+        className="w-full h-full object-cover rounded-full"
+      />
+    ) : (
+      <Plus className="w-8 h-8 text-gray-400" />
+    )}
+  </label>
+
+  <input
+    id="image-upload"
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+
+      if (!file.type.startsWith('image/')) {
+        alert('Only images allowed')
+        return
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image must be under 5MB')
+        return
+      }
+
+      setImageFile(file)
+    }}
+    className="hidden"
+  />
+</div>
+
+
         <div className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Email *
             </label>
             <input
@@ -69,18 +169,52 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
             />
           </div>
 
-          <div>
-            <label htmlFor="reminderDate" className="block text-sm font-medium text-gray-700 mb-2">
-              When should you be reminded?
-            </label>
-            <input
-              type="date"
-              id="reminderDate"
-              data-testid="reminder-input"
-              value={reminderDate}
-              onChange={(e) => setReminderDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
-            />
+          <div className="space-y-4">
+            {/* Reminder Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reminder type
+              </label>
+
+              <select
+                value={reminderType}
+                onChange={(e) =>
+                  setReminderType(e.target.value as "monthly" | "date")
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="monthly">Remind me every month</option>
+                <option value="date">Remind me on a specific date</option>
+              </select>
+            </div>
+
+            {/* Monthly info */}
+            {reminderType === "monthly" && (
+              <p className="text-sm text-gray-500">
+                You’ll get a reminder once every month.
+              </p>
+            )}
+
+            {/* Specific date */}
+            {reminderType === "date" && (
+              <div>
+                <label
+                  htmlFor="reminderDate"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Select reminder date
+                </label>
+
+                <input
+                  type="date"
+                  id="reminderDate"
+                  data-testid="reminder-input"
+                  value={reminderDate}
+                  onChange={(e) => setReminderDate(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -92,7 +226,10 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
               onChange={(e) => setIsPublic(e.target.checked)}
               className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <label htmlFor="isPublic" className="text-sm font-medium text-gray-700">
+            <label
+              htmlFor="isPublic"
+              className="text-sm font-medium text-gray-700"
+            >
               Make this public on /2026
             </label>
           </div>
@@ -104,8 +241,12 @@ export default function SaveModal({ isOpen, onClose, noteData, onSaveSuccess }: 
           >
             Save resolution
           </button>
-          <div > <a  target="_parent" href="https://github.com/sharathdoes" >by @sharathdoes</a></div>
-          
+          <div>
+            {" "}
+            <a target="_blank" href="https://github.com/sharathdoes">
+              by @sharathdoes
+            </a>
+          </div>
         </div>
       </div>
     </div>

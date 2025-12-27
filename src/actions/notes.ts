@@ -19,12 +19,15 @@ function serializeNote(note: NoteWithComments | null) {
     ...note,
     createdAt: note.createdAt.toISOString(),
     reminderDate: note.reminderDate?.toISOString() ?? null,
+    reminderType: note.reminderType ?? null,
+    imageUrl: note.imageUrl ?? null,
     comments: note.comments.map(c => ({
       ...c,
       createdAt: c.createdAt.toISOString(),
     })),
   }
 }
+
 
 /* -------------------------------
    Actions
@@ -35,7 +38,11 @@ export async function saveNote(data: {
   paths: Prisma.InputJsonValue
   rotation: number
   isPublic: boolean
+
+  reminderType?: 'monthly' | 'date'
   reminderDate?: string
+
+  imageUrl?: string
 }) {
   return prisma.note.create({
     data: {
@@ -44,12 +51,20 @@ export async function saveNote(data: {
       paths: data.paths,
       rotation: data.rotation,
       isPublic: data.isPublic,
-      reminderDate: data.reminderDate
-        ? new Date(data.reminderDate)
-        : null,
+
+      reminderType: data.reminderType ?? null,
+
+      reminderDate:
+        data.reminderType === 'date' && data.reminderDate
+          ? new Date(data.reminderDate)
+          : null,
+
+      imageUrl: data.imageUrl ?? null, 
+
     },
   })
 }
+
 
 export async function getPublicNotes() {
   const notes = await prisma.note.findMany({

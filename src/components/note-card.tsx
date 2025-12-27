@@ -11,7 +11,10 @@ interface NoteCardProps {
 
 export default function NoteCard({ note }: NoteCardProps) {
 
-  
+    if (!note) {
+    return null
+  }
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -30,8 +33,17 @@ export default function NoteCard({ note }: NoteCardProps) {
           <div
             className="w-full h-full bg-[#efefef] rounded-sm flex items-center justify-center relative"
             style={{ transform: `rotate(${note.rotation}deg)` }}
-          >
+            >
+              {note.imageUrl && (
+            <img
+              src={note.imageUrl}
+              alt="Attached"
+              className="absolute top-20 left-1/2 -translate-x-1/2 w-20 h-20 object-cover rounded-sm shadow-md"
+            />
+          )}
             <div className="absolute top-4 left-4 right-4">
+
+
               <h3 className="text-2xl md:text-3xl font-bold text-blue-600 leading-none">
                 NY 2026
               </h3>
