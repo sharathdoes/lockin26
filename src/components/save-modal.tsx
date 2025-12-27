@@ -34,13 +34,16 @@ export default function SaveModal({
   const [isUploading, setIsUploading] = useState(false);
 
   if (!isOpen) return null;
-  async function uploadImageToCloudinary(file: File): Promise<string> {
+  const CLOUD_NAME = 'dmzeq8qdf'
+const UPLOAD_PRESET = 'lockin2026_unsigned'
+
+async function uploadImageToCloudinary(file: File): Promise<string> {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_PRESET!)
+  formData.append('upload_preset', UPLOAD_PRESET)
 
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
     {
       method: 'POST',
       body: formData,
@@ -52,7 +55,7 @@ export default function SaveModal({
   }
 
   const data = await res.json()
-  return data.secure_url as string
+  return data.secure_url
 }
 
  const handleSave = async () => {
