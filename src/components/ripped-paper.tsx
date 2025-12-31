@@ -114,11 +114,11 @@ export default function RippedPaper({
     },
     [currentPath]
   );
-
   const handleReset = useCallback(() => {
     onContentChange("");
+    onPathsChange([]);
     setRotation(Math.random() * 15 - 7.5);
-  }, [onContentChange]);
+  }, [onContentChange, onPathsChange]);
 
   const pointsToPath = (points: Point[]) => {
     if (points.length === 0) return "";
