@@ -1,6 +1,6 @@
 "use client";
 import { Plus } from 'lucide-react'
-
+import { useRouter } from 'next/navigation'
 import { useState } from "react";
 import { X } from "lucide-react";
 import { DrawPath } from "@/types";
@@ -18,6 +18,7 @@ interface SaveModalProps {
   onSaveSuccess: () => void;
 }
 
+
 export default function SaveModal({
   isOpen,
   onClose,
@@ -32,10 +33,26 @@ export default function SaveModal({
   const [reminderDate, setReminderDate] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+const router = useRouter()
 
   if (!isOpen) return null;
   const CLOUD_NAME = 'dmzeq8qdf'
 const UPLOAD_PRESET = 'lockin2026_unsigned'
+const validateForm = () => {
+  if (!email.trim()) {
+    alert('Email is required')
+    return false
+  }
+
+ 
+
+  if (reminderType === 'date' && !reminderDate) {
+    alert('Please select a reminder date')
+    return false
+  }
+
+  return true
+}
 
 async function uploadImageToCloudinary(file: File): Promise<string> {
   const formData = new FormData()
@@ -59,6 +76,8 @@ async function uploadImageToCloudinary(file: File): Promise<string> {
 }
 
  const handleSave = async () => {
+    if (!validateForm()) return
+
   try {
     setIsUploading(true)
     if (reminderType === 'date' && !reminderDate) {
@@ -86,6 +105,7 @@ async function uploadImageToCloudinary(file: File): Promise<string> {
 
     onSaveSuccess()
     onClose()
+        router.push('/2026')
   } catch (err) {
     console.error(err)
     alert('Failed to save note')
@@ -237,13 +257,22 @@ async function uploadImageToCloudinary(file: File): Promise<string> {
             </label>
           </div>
 
-          <button
-            onClick={handleSave}
-            data-testid="save-note-button"
-            className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Save resolution
-          </button>
+         <button
+  onClick={handleSave}
+  disabled={isUploading}
+  data-testid="save-note-button"
+  className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+>
+  {isUploading ? (
+    <>
+      <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+      Saving...
+    </>
+  ) : (
+    "Save resolution"
+  )}
+</button>
+
           <div>
             {" "}
             <a target="_blank" href="https://github.com/sharathdoes">

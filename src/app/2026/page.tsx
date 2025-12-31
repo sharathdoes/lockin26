@@ -32,7 +32,7 @@ export default function Feed2026() {
             /2026
           </h1>
           <p className="text-gray-400 text-lg">
-            Public resolutions from people around the world
+             Resolutions from people around the world, cheer em up !!!
           </p>
         </div>
 
@@ -43,7 +43,7 @@ export default function Feed2026() {
           </div>
         ) : notes.length === 0 ? (
           <div className="text-center text-gray-400 py-20">
-            <p className="text-xl mb-4">No public resolutions yet.</p>
+            <p className="text-xl mb-4">No  resolutions yet.</p>
             <p>Be the first to share your 2026 goals.</p>
           </div>
         ) : (

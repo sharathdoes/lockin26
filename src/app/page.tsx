@@ -5,9 +5,24 @@ import { useState, useEffect } from 'react';
 import { DrawPath } from '@/types'
 import Header from '@/components/header'
 import SaveModal from '@/components/save-modal'
-const DynamicRippedPaper = dynamic(() => import('@/components/ripped-paper'), { ssr: false })
+
+
+const DynamicRippedPaper = dynamic(
+  () => import('@/components/ripped-paper'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-screen h-screen flex items-center justify-center bg-black text-white">
+        <h1 className="text-xl md:text-xl font-bold animate-pulse">
+          Happy New Year 
+        </h1>
+      </div>
+    ),
+  }
+)
 
 export default function Home() {
+  
   const [content, setContent] = useState('')
   const [paths, setPaths] = useState<DrawPath[]>([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -43,11 +58,16 @@ export default function Home() {
      <Header onSave={handleSave} showSaveButton={true} />
       
       {saveSuccess && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg z-50 shadow-lg" data-testid="success-message">
+        <div className="fixed top-24 left-1/2 -translate-x-1/2  px-6 py-3 rounded-lg z-50 shadow-lg" data-testid="success-message">
           ✓ LockIn saved successfully!
         </div>
       )}
-      <DynamicRippedPaper content={content} onContentChange={handleContentChange} />
+<DynamicRippedPaper
+  content={content}
+  onContentChange={handleContentChange}
+  paths={paths}
+  onPathsChange={setPaths}
+/>
       
        <SaveModal
         isOpen={showSaveModal}
@@ -55,7 +75,7 @@ export default function Home() {
         noteData={{
           content,
           paths,
-          
+      
           rotation,
         }}
         onSaveSuccess={handleSaveSuccess}

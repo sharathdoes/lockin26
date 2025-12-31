@@ -6,11 +6,15 @@ import { Pencil, Type, Download, RotateCcw } from "lucide-react";
 import html2canvas from "@jsplumb/html2canvas";
 import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/get-media-query";
+import { DrawPath } from "@/types";
 
 interface RippedPaperProps {
-  content: string;
-  onContentChange: (value: string) => void;
+  content: string
+  onContentChange: (value: string) => void
+  paths: DrawPath[]
+  onPathsChange: (paths: DrawPath[]) => void
 }
+
 
 interface Point {
   x: number;
@@ -37,10 +41,11 @@ const UNDERLINE_PATH = `
 export default function RippedPaper({
   content,
   onContentChange,
+  onPathsChange,
+  paths,
 }: RippedPaperProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [paths, setPaths] = useState<Path[]>([]);
   const [currentPath, setCurrentPath] = useState<Point[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDrawMode, setIsDrawMode] = useState(false);
@@ -88,10 +93,16 @@ export default function RippedPaper({
   const stopDrawing = useCallback(
     (e: React.PointerEvent<SVGSVGElement>) => {
       if (currentPath.length > 0) {
-        setPaths((prev) => [
-          ...prev,
-          { points: currentPath, id: Math.random().toString() },
-        ]);
+   onPathsChange([
+  ...paths,
+  {
+    id: crypto.randomUUID(),
+    points: currentPath,
+    color: "#2563eb",
+    width: 2,
+  },
+])
+
         setCurrentPath([]);
       }
       setIsDrawing(false);
@@ -105,7 +116,6 @@ export default function RippedPaper({
   );
 
   const handleReset = useCallback(() => {
-    setPaths([]);
     onContentChange("");
     setRotation(Math.random() * 15 - 7.5);
   }, [onContentChange]);
@@ -233,17 +243,18 @@ export default function RippedPaper({
                 userSelect: "none",
               }}
             >
-              {paths.map((path) => (
-                <path
-                  key={path.id}
-                  d={pointsToPath(path.points)}
-                  stroke="#2563eb"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              ))}
+             {paths.map((path) => (
+  <path
+    key={path.id}
+    d={pointsToPath(path.points)}
+    stroke={path.color}
+    strokeWidth={path.width}
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />
+))}
+
               {currentPath.length > 0 && (
                 <path
                   d={pointsToPath(currentPath)}
