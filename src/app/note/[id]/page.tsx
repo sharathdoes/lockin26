@@ -23,9 +23,6 @@ export default function NotePage() {
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  /* -------------------------------
-     Load note
-  -------------------------------- */
   useEffect(() => {
     async function load() {
       if (!params.id) return
@@ -43,9 +40,6 @@ setNote(mapNoteDTO(data))
     load()
   }, [params.id])
 
-  /* -------------------------------
-     Cheer
-  -------------------------------- */
   const handleCheer = async () => {
     if (!note || hasCheered) return
 
@@ -55,9 +49,6 @@ setNote(mapNoteDTO(data))
     await cheerNote(note.id)
   }
 
-  /* -------------------------------
-     Add comment
-  -------------------------------- */
   const handleAddComment = async () => {
     if (!note || !commentText.trim() || !commentEmail.trim()) {
       alert('Please fill in both email and comment')
@@ -80,9 +71,6 @@ setNote(mapNoteDTO(data))
     setShowCommentForm(false)
   }
 
-  /* -------------------------------
-     Utils
-  -------------------------------- */
   const pointsToPath = (points: Point[]) => {
     if (points.length === 0) return ''
     return points
@@ -101,9 +89,6 @@ setNote(mapNoteDTO(data))
     })
   }
 
-  /* -------------------------------
-     States
-  -------------------------------- */
   if (loading) {
     return (
       <div className="min-h-screen bg-black">
@@ -131,10 +116,6 @@ setNote(mapNoteDTO(data))
       </div>
     )
   }
-
-  /* -------------------------------
-     Render
-  -------------------------------- */
   return (
     <div className="min-h-screen bg-black">
       <Header />
@@ -151,14 +132,14 @@ setNote(mapNoteDTO(data))
                 <svg className="absolute inset-0 w-full h-full">
                   {note.paths.map((path: DrawPath) => (
                     <path
-                      key={path.id}
-                      d={pointsToPath(path.points)}
-                      stroke={path.color}
-                      strokeWidth={path.width}
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+        key={path.id}
+        d={pointsToPath(path.points)}
+        stroke={path.color}
+        strokeWidth={path.width}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
                   ))}
                 </svg>
 
@@ -201,7 +182,6 @@ setNote(mapNoteDTO(data))
 
 )}
 
-            {/* Interaction bar */}
             <div className="flex justify-between bg-gray-900 p-4 rounded-lg text-white">
               <span className="text-sm text-gray-400">
                 Created {formatDate(note.createdAt)}
