@@ -174,11 +174,31 @@ setNote(mapNoteDTO(data))
               </div>
             </div>
                   {note.imageUrl && (
-  <img
-    src={note.imageUrl}
-    alt="Attached"
-    className="absolute top-20 right-1/2 -translate-x-1/2 w-40 h-40 object-cover rounded-sm shadow-md"
-  />
+ <img
+  src={note.imageUrl}
+  alt="Attached"
+  className="
+    absolute
+    w-16 h-16
+    object-cover
+    rounded-sm
+    shadow-md
+
+    /* 📱 mobile (default) */
+    top-32
+    left-60
+    -translate-x-1/2
+
+    /* 💻 desktop */
+    sm:top-20
+    sm:right-1/2
+    sm:left-auto
+    sm:-translate-x-1/2
+    sm:w-40
+    sm:h-40
+  "
+/>
+
 )}
 
             {/* Interaction bar */}
